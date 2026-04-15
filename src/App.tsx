@@ -8,7 +8,7 @@ import Background from './components/Background';
 import AuthPage from './pages/AuthPage';
 import ProfilePage from './pages/ProfilePage';
 import CheckoutPage from './pages/CheckoutPage';
-import { beats, licenses } from './data/beats';
+import { beats, defaultLicenses } from './data/beats';
 import { Beat, CartItem } from './types';
 
 interface User {
@@ -19,20 +19,23 @@ interface User {
 function useCart() {
   const [cart, setCart] = useState<CartItem[]>([]);
   
-  const addToCart = (id: number, license?: string, licenseType?: string) => {
+  const addToCart = (id: number, license?: string, licenseType?: string, licensePrice?: number) => {
     const beat = beats.find(b => b.id === id);
     if (!beat) return;
     
-    const selectedLicense = license ? licenses.find(l => l.name === license) : licenses[0];
+    const beatLicenses = beat.licenses || defaultLicenses;
+    const selectedLicense = license ? beatLicenses.find(l => l.name === license) : beatLicenses[0];
+    const price = licensePrice ?? selectedLicense?.price ?? beat.price;
     
     setCart(prev => {
-      const exists = prev.find(item => item.id === id && item.license === (license || selectedLicense?.name));
+      const exists = prev.find(item => item.id === id);
       if (exists) return prev;
       
       return [...prev, {
         ...beat,
-        license: license || selectedLicense?.name || licenses[0].name,
-        licenseType: licenseType || selectedLicense?.type || licenses[0].type,
+        license: license || selectedLicense?.name || beatLicenses[0].name,
+        licenseType: licenseType || selectedLicense?.type || beatLicenses[0].type,
+        cartPrice: price,
       }];
     });
   };
@@ -70,7 +73,8 @@ export default function App() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const closeBeat = () => {
+  const handleSetActiveTab = (tab: string) => {
+    setActiveTab(tab);
     setCurrentBeat(null);
   };
 
@@ -102,7 +106,7 @@ export default function App() {
         <Navbar
           cartCount={cart.length}
           activeTab={activeTab}
-          setActiveTab={setActiveTab}
+          setActiveTab={handleSetActiveTab}
           searchQuery={searchQuery}
           setSearchQuery={setSearchQuery}
         />
@@ -116,7 +120,6 @@ export default function App() {
         ) : currentBeat ? (
           <BeatPage
             beat={currentBeat}
-            onBack={closeBeat}
             onAddToCart={addToCart}
             inCart={isInCart(currentBeat.id)}
           />
@@ -222,26 +225,28 @@ export default function App() {
         }
 
         .glass-card {
-          background: rgba(0, 0, 0, 0.2);
-          backdrop-filter: blur(5px);
-          -webkit-backdrop-filter: blur(24px);
-          border: 1px solid rgba(255, 255, 255, 0.1);
+          background: rgba(28, 28, 28, 0.2);
+          backdrop-filter: blur(6px);
+          -webkit-backdrop-filter: blur(6px);
+          border: 1px solid rgba(255, 255, 255, 0.07);
+          box-shadow: 0 4px 32px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.06);
           transition: all 0.3s ease;
         }
 
         .glass-card:hover {
-          border-color: rgba(255, 255, 255, 0.3);
+          border-color: rgba(255, 255, 255, 0.12);
+          box-shadow: 0 8px 40px rgba(0, 0, 0, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.08);
         }
 
         .glass-btn {
           background: rgba(255, 255, 255, 0.1);
-          border: 1px solid rgba(255, 255, 255, 0.2);
+          border: 1px solid rgba(255, 255, 255, 0.15);
           transition: all 0.2s ease;
         }
 
         .glass-btn:hover {
-          background: rgba(255, 255, 255, 0.3);
-          border-color: rgba(255, 255, 255, 0.4);
+          background: rgba(255, 255, 255, 0.15);
+          border-color: rgba(255, 255, 255, 0.25);
         }
 
         .price-old {

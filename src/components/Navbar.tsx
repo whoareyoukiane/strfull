@@ -146,9 +146,6 @@ export default function Navbar({ cartCount, activeTab, setActiveTab, searchQuery
                     : isHovered
                       ? 'rgba(255, 255, 255, 0.06)'
                       : 'transparent',
-                  boxShadow: isActive
-                    ? 'inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 2px 10px rgba(0,0,0,0.45)'
-                    : 'none',
                   transition: 'background 0.2s, box-shadow 0.2s',
                 }}
               >

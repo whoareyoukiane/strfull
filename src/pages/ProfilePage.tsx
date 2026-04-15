@@ -21,34 +21,13 @@ export default function ProfilePage({ user, onLogout, onBack }: ProfilePageProps
       padding: '20px 40px 60px',
       color: '#ffffff',
     }}>
-      {/* Header with back button and logout */}
+      {/* Header withlogout */}
       <div style={{
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
         marginBottom: '40px'
       }}>
-        <button
-          onClick={onBack}
-          style={{
-            background: 'none',
-            border: 'none',
-            color: 'rgba(255,255,255,0.5)',
-            fontSize: 14,
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            gap: 6,
-            padding: 0,
-            fontFamily: 'inherit',
-          }}
-        >
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-            <path d="M10 3L5 8L10 13" stroke="rgba(255,255,255,0.5)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
-          Назад
-        </button>
-
         <button
           onClick={onLogout}
           style={{
@@ -95,7 +74,7 @@ export default function ProfilePage({ user, onLogout, onBack }: ProfilePageProps
             <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '14px' }}>{user.email}</p>
           </div>
 
-          <div className="glass-card" style={{ padding: '15px', borderRadius: '20px' }}>
+          <div className="glass-card" style={{ padding: '15px', borderRadius: '20px', display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
             <button
               onClick={() => setActiveTab('purchased')}
               style={{
@@ -109,27 +88,9 @@ export default function ProfilePage({ user, onLogout, onBack }: ProfilePageProps
                 fontSize: '14px',
                 fontWeight: 600,
                 cursor: 'pointer',
-                marginBottom: '5px'
               }}
             >
               Купленные биты
-            </button>
-            <button
-              onClick={() => setActiveTab('favorites')}
-              style={{
-                width: '100%',
-                padding: '12px 15px',
-                borderRadius: '12px',
-                background: activeTab === 'favorites' ? 'rgba(255,255,255,0.1)' : 'transparent',
-                border: 'none',
-                color: activeTab === 'favorites' ? '#fff' : 'rgba(255,255,255,0.5)',
-                textAlign: 'left',
-                fontSize: '14px',
-                fontWeight: 600,
-                cursor: 'pointer'
-              }}
-            >
-              Избранное
             </button>
           </div>
         </div>

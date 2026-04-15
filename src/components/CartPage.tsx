@@ -1,58 +1,16 @@
 import { useState } from 'react';
-import { CartItem, CheckoutData } from '../types';
+import { CartItem } from '../types';
 import { IconTrash, IconCheck } from './Icons';
-
-function SbpIcon() {
-  return (
-<svg width="23" height="30" viewBox="0 0 33 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-<path d="M0 8.70667L4.92954 17.365V22.6463L0.00576674 31.2877L0 8.70667Z" fill="#5B57A2"/>
-<path d="M18.9275 14.2143L23.5466 11.4323L33 11.4237L18.9275 19.895V14.2143Z" fill="#D90751"/>
-<path d="M18.9013 8.65567L18.9275 20.119L13.9864 17.1357V0L18.9013 8.65567Z" fill="#FAB718"/>
-<path d="M33 11.4237L23.5466 11.4323L18.9013 8.65567L13.9864 0L33 11.4237Z" fill="#ED6F26"/>
-<path d="M18.9275 31.3357V25.774L13.9864 22.8473L13.9891 40L18.9275 31.3357Z" fill="#63B22F"/>
-<path d="M23.5351 28.579L4.92954 17.365L0 8.70667L32.98 28.5677L23.5351 28.579Z" fill="#1487C9"/>
-<path d="M13.9894 40L18.9275 31.3357L23.5351 28.579L32.98 28.5677L13.9894 40Z" fill="#017F36"/>
-<path d="M0.00576674 31.2877L14.0267 22.8477L9.31295 20.0057L4.92954 22.6463L0.00576674 31.2877Z" fill="#984995"/>
-</svg>
-  );
-}
-
-function TinkoffIcon() {
-  return (
-<svg width="30" height="30" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-<path d="M0 0H40V20.1171C40 25.2742 37.2488 30.0397 32.7829 32.6186L20 40L7.21719 32.6186C2.75114 30.0397 4.58451e-06 25.2742 4.58451e-06 20.1171L0 0Z" fill="white"/>
-<path fill-rule="evenodd" clip-rule="evenodd" d="M11.0345 12.4138V18.7014C11.8847 17.7303 13.4306 17.0732 15.1981 17.0732H17.1188V24.3824C17.1188 26.3271 16.5963 28.0292 15.8211 28.9655H24.176C23.4023 28.0282 22.8811 26.3284 22.8811 24.3862V17.0732H24.8019C26.5694 17.0732 28.1153 17.7303 28.9655 18.7014V12.4138H11.0345Z" fill="#333333"/>
-</svg>
-  );
-}
-
-function AlphaIcon() {
-  return (  
-<svg width="16" height="30" viewBox="0 0 26 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-<path d="M26 34.5387H0V40H26V34.5387Z" fill="white"/>
-<path d="M17.7594 4.00074C17.0186 1.76531 16.1638 0 13.2355 0C10.3072 0 9.3991 1.75787 8.61785 4.00074L0.57373 27.1188H5.90829L7.76491 21.6222H18.0296L19.752 27.1188H25.4248L17.7576 4.00074H17.7594ZM9.32005 16.9804L12.9671 6.02434H13.1013L16.5462 16.9804H9.32005Z" fill="white"/>
-</svg>
-  );
-}
-
-function CardIcon() {
-  return (
-<svg width="45" height="30" viewBox="0 0 65 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-<path fill-rule="evenodd" clip-rule="evenodd" d="M14.5524 0L10.9121 10.0017H61.3596L65 0H14.5524ZM9.09073 15.0003L5.45035 24.9997H55.8979L59.5383 15.0003H9.09073ZM3.64038 30.0006L0 40H50.4476L54.0857 30.0006H3.64038Z" fill="#00AAFF"/>
-</svg>
-  );
-}
 
 interface CartPageProps {
   cartItems: CartItem[];
   onRemoveFromCart: (id: number) => void;
-  onCheckout: (payload: CheckoutData) => void;
-  defaultEmail?: string;
+  onCheckout: (total: number) => void;
 }
 
-export default function CartPage({ cartItems, onRemoveFromCart, onCheckout, defaultEmail = '' }: CartPageProps) {
+export default function CartPage({ cartItems, onRemoveFromCart, onCheckout }: CartPageProps) {
   const [selectedItems, setSelectedItems] = useState<Set<number>>(new Set(cartItems.map(item => item.id)));
-  const [email, setEmail] = useState(defaultEmail);
+  const [email, setEmail] = useState('');
 
   const toggleSelectAll = () => {
     if (selectedItems.size === cartItems.length) {
@@ -73,13 +31,58 @@ export default function CartPage({ cartItems, onRemoveFromCart, onCheckout, defa
   };
 
   const selectedCartItems = cartItems.filter(item => selectedItems.has(item.id));
-  const totalPrice = selectedCartItems.reduce((sum, item) => sum + item.price, 0);
+  const totalPrice = selectedCartItems.reduce((sum, item) => sum + item.cartPrice, 0);
 
   const paymentMethods = [
-    { id: 'sbp', name: 'СБП', color: '#ffffff', icon: <SbpIcon /> },
-    { id: 'tinkoff', name: 'Tinkoff', color: '#FFDD2D', icon: <TinkoffIcon /> },
-    { id: 'alpha', name: 'Alpha', color: '#EF3124', icon: <AlphaIcon /> },
-    { id: 'card', name: 'Карта', color: '#102D71', icon: <CardIcon /> },
+    { 
+      id: 'sbp', 
+      name: 'СБП', 
+      bg: '#ffffff', 
+      icon: (
+        <svg width="23" height="30" viewBox="0 0 33 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M0 8.70667L4.92954 17.365V22.6463L0.00576674 31.2877L0 8.70667Z" fill="#5B57A2"/>
+<path d="M18.9275 14.2143L23.5466 11.4323L33 11.4237L18.9275 19.895V14.2143Z" fill="#D90751"/>
+<path d="M18.9013 8.65567L18.9275 20.119L13.9864 17.1357V0L18.9013 8.65567Z" fill="#FAB718"/>
+<path d="M33 11.4237L23.5466 11.4323L18.9013 8.65567L13.9864 0L33 11.4237Z" fill="#ED6F26"/>
+<path d="M18.9275 31.3357V25.774L13.9864 22.8473L13.9891 40L18.9275 31.3357Z" fill="#63B22F"/>
+<path d="M23.5351 28.579L4.92954 17.365L0 8.70667L32.98 28.5677L23.5351 28.579Z" fill="#1487C9"/>
+<path d="M13.9894 40L18.9275 31.3357L23.5351 28.579L32.98 28.5677L13.9894 40Z" fill="#017F36"/>
+<path d="M0.00576674 31.2877L14.0267 22.8477L9.31295 20.0057L4.92954 22.6463L0.00576674 31.2877Z" fill="#984995"/>
+</svg>
+      )
+    },
+    { 
+      id: 'tinkoff', 
+      name: 'Tinkoff', 
+      bg: '#FFDD2D', 
+      icon: (
+         <svg width="30" height="30" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M0 0H40V20.1171C40 25.2742 37.2488 30.0397 32.7829 32.6186L20 40L7.21719 32.6186C2.75114 30.0397 4.58451e-06 25.2742 4.58451e-06 20.1171L0 0Z" fill="white"/>
+<path fill-rule="evenodd" clip-rule="evenodd" d="M11.0345 12.4138V18.7014C11.8847 17.7303 13.4306 17.0732 15.1981 17.0732H17.1188V24.3824C17.1188 26.3271 16.5963 28.0292 15.8211 28.9655H24.176C23.4023 28.0282 22.8811 26.3284 22.8811 24.3862V17.0732H24.8019C26.5694 17.0732 28.1153 17.7303 28.9655 18.7014V12.4138H11.0345Z" fill="#333333"/>
+</svg>
+      )
+    },
+    { 
+      id: 'alpha', 
+      name: 'Alpha', 
+      bg: '#EF3124', 
+      icon: (
+        <svg width="16" height="30" viewBox="0 0 26 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M26 34.5387H0V40H26V34.5387Z" fill="white"/>
+<path d="M17.7594 4.00074C17.0186 1.76531 16.1638 0 13.2355 0C10.3072 0 9.3991 1.75787 8.61785 4.00074L0.57373 27.1188H5.90829L7.76491 21.6222H18.0296L19.752 27.1188H25.4248L17.7576 4.00074H17.7594ZM9.32005 16.9804L12.9671 6.02434H13.1013L16.5462 16.9804H9.32005Z" fill="white"/>
+</svg>
+      )
+    },
+    { 
+      id: 'card', 
+      name: 'Карта', 
+      bg: '#102D71', 
+      icon: (
+         <svg width="40" height="30" viewBox="0 0 65 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path fill-rule="evenodd" clip-rule="evenodd" d="M14.5524 0L10.9121 10.0017H61.3596L65 0H14.5524ZM9.09073 15.0003L5.45035 24.9997H55.8979L59.5383 15.0003H9.09073ZM3.64038 30.0006L0 40H50.4476L54.0857 30.0006H3.64038Z" fill="#00AAFF"/>
+</svg>
+      )
+    },
   ];
 
   const [selectedPayment, setSelectedPayment] = useState('sbp');
@@ -133,9 +136,9 @@ export default function CartPage({ cartItems, onRemoveFromCart, onCheckout, defa
       }}>
         {/* Left column - Cart items */}
         <div style={{
-          background: 'rgba(0, 0, 0, 0.2)',
+          background: 'rgba(28, 28, 28, 0.2)',
           backdropFilter: 'blur(6px)',
-          WebkitBackdropFilter: 'blur(24px)',
+          WebkitBackdropFilter: 'blur(6px)',
           borderRadius: 24,
           border: '1px solid rgba(255,255,255,0.07)',
           padding: '24px',
@@ -273,7 +276,7 @@ export default function CartPage({ cartItems, onRemoveFromCart, onCheckout, defa
                       fontWeight: 700,
                       letterSpacing: '-0.02em',
                     }}>
-                      {item.price}₽
+                      {item.cartPrice}₽
                     </span>
                     <button
                       onClick={() => onRemoveFromCart(item.id)}
@@ -304,9 +307,9 @@ export default function CartPage({ cartItems, onRemoveFromCart, onCheckout, defa
 
         {/* Right column - Summary */}
         <div style={{
-          background: 'rgba(0, 0, 0, 0.2)',
+          background: 'rgba(28, 28, 28, 0.2)',
           backdropFilter: 'blur(6px)',
-          WebkitBackdropFilter: 'blur(24px)',
+          WebkitBackdropFilter: 'blur(6px)',
           borderRadius: 24,
           border: '1px solid rgba(255,255,255,0.07)',
           padding: '24px',
@@ -384,7 +387,7 @@ export default function CartPage({ cartItems, onRemoveFromCart, onCheckout, defa
                   fontWeight: 700,
                   flexShrink: 0,
                 }}>
-                  {item.price}₽
+                  {item.cartPrice}₽
                 </span>
               </div>
             ))}
@@ -413,7 +416,7 @@ export default function CartPage({ cartItems, onRemoveFromCart, onCheckout, defa
                   height: 64,
                   borderRadius: 12,
                   border: selectedPayment === method.id ? '2px solid rgba(255,255,255,0.3)' : '2px solid transparent',
-                  background: method.color,
+                  background: method.bg,
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -421,6 +424,7 @@ export default function CartPage({ cartItems, onRemoveFromCart, onCheckout, defa
                   padding: 0,
                   transition: 'all 0.2s',
                   position: 'relative',
+                  opacity: selectedPayment === method.id ? 1 : 0.4,
                 }}
                 onMouseEnter={e => {
                   if (selectedPayment !== method.id) {
@@ -486,30 +490,23 @@ export default function CartPage({ cartItems, onRemoveFromCart, onCheckout, defa
 
           {/* Checkout button */}
           <button
-            onClick={() =>
-              onCheckout({
-                items: selectedCartItems,
-                email,
-                paymentMethod: selectedPayment,
-                total: totalPrice,
-              })
-            }
-            disabled={selectedItems.size === 0 || !/^\S+@\S+\.\S+$/.test(email)}
+            onClick={() => onCheckout(totalPrice)}
+            disabled={selectedItems.size === 0}
             style={{
               width: '100%',
               padding: '16px 0',
               borderRadius: 12,
-              background: selectedItems.size === 0 || !/^\S+@\S+\.\S+$/.test(email) ? 'rgba(255,255,255,0.2)' : '#ffffff',
+              background: selectedItems.size === 0 ? 'rgba(255,255,255,0.2)' : '#ffffff',
               border: 'none',
-              color: selectedItems.size === 0 || !/^\S+@\S+\.\S+$/.test(email) ? 'rgba(255,255,255,0.4)' : '#111111',
+              color: selectedItems.size === 0 ? 'rgba(255,255,255,0.4)' : '#111111',
               fontSize: 15,
               fontWeight: 700,
-              cursor: selectedItems.size === 0 || !/^\S+@\S+\.\S+$/.test(email) ? 'not-allowed' : 'pointer',
+              cursor: selectedItems.size === 0 ? 'not-allowed' : 'pointer',
               fontFamily: 'inherit',
               transition: 'all 0.2s',
             }}
             onMouseEnter={e => {
-              if (selectedItems.size > 0 && /^\S+@\S+\.\S+$/.test(email)) {
+              if (selectedItems.size > 0) {
                 e.currentTarget.style.opacity = '0.88';
               }
             }}
